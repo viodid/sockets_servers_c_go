@@ -1,0 +1,41 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <netdb.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+
+int main(void)
+{
+  	int				sfd;
+	struct addrinfo	hints;
+	struct addrinfo	*result, *rp;
+
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family =  AF_INET;
+	hints.ai_socktype = SOCK_STREAM;
+
+	if (getaddrinfo(NULL, "5555", &hints, &result) != 0)
+	{
+		perror("getaddrinfo");
+		exit(EXIT_FAILURE);
+	}
+
+	for (rp = result; rp != NULL; rp = rp->ai_next)
+	{
+		sfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+		if (sfd == -1)
+			continue;
+		if (bind(sfd, rp->ai_addr, rp->ai_addrlen) == 0)
+			break;
+		close(sfd);
+	}
+	if (rp == NULL)
+	{
+		perror("Could not bind");
+		exit(EXIT_FAILURE);
+	}
+	freeaddrinfo(result);
+	return (0);
+}
