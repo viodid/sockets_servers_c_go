@@ -36,11 +36,11 @@ int main(void)
 		perror("Could not bind");
 		exit(EXIT_FAILURE);
 	}
-	freeaddrinfo(result);
 	if (listen(sfd, 0) == -1)
 	{
 		perror("listen");
 		close(sfd);
+        freeaddrinfo(result);
 		exit(EXIT_FAILURE);
 	}
 	cfd = accept(sfd, rp->ai_addr, &rp->ai_addrlen);
@@ -48,7 +48,12 @@ int main(void)
 	{
 		perror("accept");
 		close(sfd);
+        freeaddrinfo(result);
 		exit(EXIT_FAILURE);
 	}
+	write(cfd, "hey there!", 11);
+	freeaddrinfo(result);
+	close(cfd);
+	close(sfd);
 	return (0);
 }
