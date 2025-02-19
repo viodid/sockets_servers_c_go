@@ -8,7 +8,7 @@
 
 int main(void)
 {
-  	int				sfd;
+  	int				sfd, cfd;
 	struct addrinfo	hints;
 	struct addrinfo	*result, *rp;
 
@@ -37,5 +37,18 @@ int main(void)
 		exit(EXIT_FAILURE);
 	}
 	freeaddrinfo(result);
+	if (listen(sfd, 0) == -1)
+	{
+		perror("listen");
+		close(sfd);
+		exit(EXIT_FAILURE);
+	}
+	cfd = accept(sfd, rp->ai_addr, &rp->ai_addrlen);
+	if (cfd == -1)
+	{
+		perror("accept");
+		close(sfd);
+		exit(EXIT_FAILURE);
+	}
 	return (0);
 }
